@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 singwhatiwanna(任玉刚) <singwhatiwanna@gmail.com>
  *
- * collaborator:田啸,宋思宇
+ * collaborator:田啸,宋思宇,Mr.Simple
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.ryg.dynamicload;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -29,15 +31,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager.LayoutParams;
 
+import com.ryg.dynamicload.internal.DLAttachable;
 import com.ryg.dynamicload.internal.DLPluginManager;
 import com.ryg.dynamicload.internal.DLProxyImpl;
-import com.ryg.dynamicload.internal.DLProxyImpl.DLProxy;
 
-public class DLProxyActivity extends Activity implements DLProxy {
+public class DLProxyActivity extends Activity implements DLAttachable {
 
     protected DLPlugin mRemoteActivity;
     private DLProxyImpl impl = new DLProxyImpl(this);
-    private DLPluginManager mPluginManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,6 @@ public class DLProxyActivity extends Activity implements DLProxy {
     @Override
     public void attach(DLPlugin remoteActivity, DLPluginManager pluginManager) {
         mRemoteActivity = remoteActivity;
-        mPluginManager = pluginManager;
     }
 
     @Override
@@ -171,6 +171,11 @@ public class DLProxyActivity extends Activity implements DLProxy {
     public boolean onOptionsItemSelected(MenuItem item) {
         mRemoteActivity.onOptionsItemSelected(item);
         return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    public ComponentName startService(Intent service) {
+        return super.startService(service);
     }
 
 }

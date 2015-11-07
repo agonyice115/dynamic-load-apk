@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 singwhatiwanna(任玉刚) <singwhatiwanna@gmail.com>
  *
- * collaborator:田啸,宋思宇
+ * collaborator:田啸,宋思宇,Mr.Simple
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.ryg.dynamicload;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -42,7 +45,8 @@ import com.ryg.utils.DLConstants;
 
 /**
  * note: can use that like this.
- * @see {@link DLBasePluginActivity.that} 
+ * 
+ * @see {@link DLBasePluginActivity.that}
  * @author renyugang
  */
 public class DLBasePluginActivity extends Activity implements DLPlugin {
@@ -67,7 +71,7 @@ public class DLBasePluginActivity extends Activity implements DLPlugin {
     @Override
     public void attach(Activity proxyActivity, DLPluginPackage pluginPackage) {
         Log.d(TAG, "attach: proxyActivity= " + proxyActivity);
-        mProxyActivity = (Activity)proxyActivity;
+        mProxyActivity = (Activity) proxyActivity;
         that = mProxyActivity;
         mPluginPackage = pluginPackage;
     }
@@ -84,7 +88,8 @@ public class DLBasePluginActivity extends Activity implements DLPlugin {
         }
 
         mPluginManager = DLPluginManager.getInstance(that);
-        Log.d(TAG, "onCreate: from= " + (mFrom == DLConstants.FROM_INTERNAL ? "DLConstants.FROM_INTERNAL" : "FROM_EXTERNAL"));
+        Log.d(TAG, "onCreate: from= "
+                + (mFrom == DLConstants.FROM_INTERNAL ? "DLConstants.FROM_INTERNAL" : "FROM_EXTERNAL"));
     }
 
     @Override
@@ -358,8 +363,9 @@ public class DLBasePluginActivity extends Activity implements DLPlugin {
 
     /**
      * @param dlIntent
-     * @return may be {@link #START_RESULT_SUCCESS}, {@link #START_RESULT_NO_PKG},
-     *    {@link #START_RESULT_NO_CLASS}, {@link #START_RESULT_TYPE_ERROR}
+     * @return may be {@link #START_RESULT_SUCCESS},
+     *         {@link #START_RESULT_NO_PKG}, {@link #START_RESULT_NO_CLASS},
+     *         {@link #START_RESULT_TYPE_ERROR}
      */
     public int startPluginActivity(DLIntent dlIntent) {
         return startPluginActivityForResult(dlIntent, -1);
@@ -367,8 +373,9 @@ public class DLBasePluginActivity extends Activity implements DLPlugin {
 
     /**
      * @param dlIntent
-     * @return may be {@link #START_RESULT_SUCCESS}, {@link #START_RESULT_NO_PKG},
-     *    {@link #START_RESULT_NO_CLASS}, {@link #START_RESULT_TYPE_ERROR}
+     * @return may be {@link #START_RESULT_SUCCESS},
+     *         {@link #START_RESULT_NO_PKG}, {@link #START_RESULT_NO_CLASS},
+     *         {@link #START_RESULT_TYPE_ERROR}
      */
     public int startPluginActivityForResult(DLIntent dlIntent, int requestCode) {
         if (mFrom == DLConstants.FROM_EXTERNAL) {
@@ -378,5 +385,67 @@ public class DLBasePluginActivity extends Activity implements DLPlugin {
         }
         return mPluginManager.startPluginActivityForResult(that, dlIntent, requestCode);
     }
+    
+    public int startPluginService(DLIntent dlIntent) {
+        if (mFrom == DLConstants.FROM_EXTERNAL) {
+            if (dlIntent.getPluginPackage() == null) {
+                dlIntent.setPluginPackage(mPluginPackage.packageName);
+            }
+        }
+        return mPluginManager.startPluginService(that, dlIntent);
+    }
+    public int stopPluginService(DLIntent dlIntent) {
+        if (mFrom == DLConstants.FROM_EXTERNAL) {
+            if (dlIntent.getPluginPackage() == null) {
+                dlIntent.setPluginPackage(mPluginPackage.packageName);
+            }
+        }
+        return mPluginManager.stopPluginService(that, dlIntent);
+    }
+    
+    public int bindPluginService(DLIntent dlIntent, ServiceConnection conn, int flags) {
+        if (mFrom == DLConstants.FROM_EXTERNAL) {
+            if (dlIntent.getPluginPackage() == null) {
+                dlIntent.setPluginPackage(mPluginPackage.packageName);
+            }
+        }
+        return mPluginManager.bindPluginService(that, dlIntent, conn, flags);
+    }
+    
+    public int unBindPluginService(DLIntent dlIntent, ServiceConnection conn) {
+        if (mFrom == DLConstants.FROM_EXTERNAL) {
+            if (dlIntent.getPluginPackage() == null)
+            dlIntent.setPluginPackage(mPluginPackage.packageName);
+        }
+        return mPluginManager.unBindPluginService(that, dlIntent, conn);
+    }
+
+//    /**
+//     * 直接调用that.startService
+//     * that 可能有两种情况
+//     * 1.指向this 
+//     * 2.指向DLProxyActivity 
+//     */
+//    public ComponentName startService(Intent service) {
+//        return that.startService(service);
+//    }
+//
+//    @Override
+//    public boolean stopService(Intent name) {
+//        // TODO Auto-generated method stub
+//        return super.stopService(name);
+//    }
+//
+//    @Override
+//    public boolean bindService(Intent service, ServiceConnection conn, int flags) {
+//        // TODO Auto-generated method stub
+//        return super.bindService(service, conn, flags);
+//    }
+//
+//    @Override
+//    public void unbindService(ServiceConnection conn) {
+//        // TODO Auto-generated method stub
+//        super.unbindService(conn);
+//    }
 
 }

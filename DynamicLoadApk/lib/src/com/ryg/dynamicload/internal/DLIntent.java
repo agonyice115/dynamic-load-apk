@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 singwhatiwanna(任玉刚) <singwhatiwanna@gmail.com>
  *
- * collaborator:田啸,宋思宇
+ * collaborator:田啸,宋思宇,Mr.Simple
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.ryg.dynamicload.internal;
 
 import android.content.Intent;
+import android.os.Parcelable;
+
+import com.ryg.utils.DLConfigs;
+
+import java.io.Serializable;
 
 public class DLIntent extends Intent {
+    
+    
 
     private String mPluginPackage;
     private String mPluginClass;
@@ -63,6 +71,24 @@ public class DLIntent extends Intent {
 
     public void setPluginClass(Class<?> clazz) {
         this.mPluginClass = clazz.getName();
+    }
+
+    @Override
+    public Intent putExtra(String name, Parcelable value) {
+        setupExtraClassLoader(value);
+        return super.putExtra(name, value);
+    }
+
+    @Override
+    public Intent putExtra(String name, Serializable value) {
+        setupExtraClassLoader(value);
+        return super.putExtra(name, value);
+    }
+
+    private void setupExtraClassLoader(Object value) {
+        ClassLoader pluginLoader = value.getClass().getClassLoader();
+        DLConfigs.sPluginClassloader = pluginLoader;
+        setExtrasClassLoader(pluginLoader);
     }
 
 }
